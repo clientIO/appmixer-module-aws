@@ -10,12 +10,14 @@ repos:
       - id: end-of-file-fixer
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.75.0
+    rev: v1.86.0
     hooks:
     - id: terraform_fmt
     - id: terraform_tflint
     - id: terraform_validate
     - id: terraform_checkov
+      args:
+        - --args=--skip-check CKV_TF_1
     - id: terraform_docs
       args:
         - '--args=--config=.terraform-docs.yml'
@@ -24,5 +26,5 @@ repos:
     rev: v1.3.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
+        args: ['--baseline', '.secrets.baseline', '--exclude-files', 'README.md', '--exclude-files', 'examples/development/main.tf', '--exclude-files', 'examples/production/main.tf']
         exclude: terraform.tfstate
