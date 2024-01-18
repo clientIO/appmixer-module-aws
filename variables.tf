@@ -242,6 +242,33 @@ variable "enable_deletion_protection" {
   description = "Enable deletion protection for all resources, if true, resources can't be deleted if not explicitly set to false"
 }
 
+variable "alb_ingress_security_group_rules" {
+  type = map(object({
+    ip_protocol                  = string
+    from_port                    = optional(number)
+    to_port                      = optional(number)
+    referenced_security_group_id = optional(string)
+    description                  = optional(string)
+    cidr_ipv4                    = optional(string)
+    cidr_ipv6                    = optional(string)
+  }))
+  default = {
+    all_http = {
+      from_port   = 80
+      to_port     = 80
+      ip_protocol = "tcp"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+    all_https = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      cidr_ipv4   = "0.0.0.0/0"
+  } }
+
+  description = "Application Load Balancer security group ingress rules"
+}
+
 variable "ecs_cluster_configuration" {
   type = any
   default = {
@@ -363,6 +390,7 @@ variable "ecs_per_service_config" {
   description = <<EOF
     Configuration per service, overrides 'ecs_common_service_config'
     Example:
+    ```
     {
       engine = {
         image = "registry.appmixer.com/appmixer-engine:5.2.0-nocomp"
@@ -384,7 +412,9 @@ variable "ecs_per_service_config" {
 
         force_new_deployment = true
         wait_for_steady_state = true
-        ordered_placement_strategy = [{ (see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
+
+        # (see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
+        ordered_placement_strategy = [{
           type  = "binpack"
           field = "cpu"
         }]
@@ -404,5 +434,6 @@ variable "ecs_per_service_config" {
         }
       }
     }
+    ```
 EOF
 }

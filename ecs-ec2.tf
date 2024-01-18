@@ -68,20 +68,7 @@ module "alb" {
   enable_deletion_protection = var.enable_deletion_protection
 
   # Security Group
-  security_group_ingress_rules = {
-    all_http = {
-      from_port   = 80
-      to_port     = 80
-      ip_protocol = "tcp"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-    all_https = {
-      from_port   = 443
-      to_port     = 443
-      ip_protocol = "tcp"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-  } # TODO full override from var
+  security_group_ingress_rules = var.alb_ingress_security_group_rules
   security_group_egress_rules = {
     all = {
       ip_protocol = "-1"
@@ -356,7 +343,7 @@ module "ecs_service_backoffice" {
   deployment_controller = {
     type = "ECS"
   }
-  capacity_provider_strategy = module.services_configuration_merge.merged.backoffice.capacity_provider_strategy
+  capacity_provider_strategy = local.common.capacity_provider_strategy
 
   container_definitions = {
     backoffice = {
@@ -436,7 +423,6 @@ module "ecs_service_engine" {
   container_definition_defaults = {
     readonly_root_filesystem = false
   }
-
   desired_count              = module.services_configuration_merge.merged.engine.autoscaling_min_capacity
   autoscaling_min_capacity   = module.services_configuration_merge.merged.engine.autoscaling_min_capacity
   autoscaling_max_capacity   = module.services_configuration_merge.merged.engine.autoscaling_max_capacity
@@ -444,7 +430,7 @@ module "ecs_service_engine" {
   deployment_controller = {
     type = "ECS"
   }
-  capacity_provider_strategy = module.services_configuration_merge.merged.backoffice.capacity_provider_strategy
+  capacity_provider_strategy = local.common.capacity_provider_strategy
 
 
   container_definitions = {
@@ -534,8 +520,7 @@ module "ecs_service_quota" {
   deployment_controller = {
     type = "ECS"
   }
-  capacity_provider_strategy = module.services_configuration_merge.merged.backoffice.capacity_provider_strategy
-
+  capacity_provider_strategy = local.common.capacity_provider_strategy
 
 
   container_definitions = {
@@ -617,8 +602,7 @@ module "ecs_service_frontend" {
   deployment_controller = {
     type = "ECS"
   }
-  capacity_provider_strategy = module.services_configuration_merge.merged.backoffice.capacity_provider_strategy
-
+  capacity_provider_strategy = local.common.capacity_provider_strategy
 
 
   container_definitions = {
@@ -694,7 +678,7 @@ module "ecs_service_logstash" {
   deployment_controller = {
     type = "ECS"
   }
-  capacity_provider_strategy = module.services_configuration_merge.merged.backoffice.capacity_provider_strategy
+  capacity_provider_strategy = local.common.capacity_provider_strategy
 
 
   container_definitions = {

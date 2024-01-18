@@ -1,5 +1,5 @@
 locals {
-  elasticsearch_master_username = try(var.elasticsearch["master_username"], "admin") # TODO probably generate
+  elasticsearch_master_username = random_pet.elasticsearch.id
   elasticsearch_enabled         = var.external_elasticsearch == null
   elasticsearch_subnet_ids      = slice(local.private_subnet_ids, 0, min(length(local.private_subnet_ids), var.elasticsearch.instance_count))
 }
@@ -39,17 +39,16 @@ module "elasticsearch" {
   advanced_security_options_master_user_name               = local.elasticsearch_master_username
   advanced_security_options_master_user_password           = random_password.elasticsearch.result
 }
-# TODO remove all keepres from random_passwords
 resource "random_password" "elasticsearch" {
-  keepers = {
-    ami_id = module.label.id
-  }
   min_upper        = 1
   min_lower        = 1
   min_numeric      = 1
   min_special      = 1
   override_special = "-"
   length           = 16
+}
+
+resource "random_pet" "elasticsearch" {
 }
 
 

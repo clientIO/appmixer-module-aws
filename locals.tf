@@ -5,7 +5,8 @@ locals {
     url      = trimprefix(module.rabbit_mq.primary_console_url, "https://")
     username = module.rabbit_mq.application_username
     password = random_password.rabbit_mq.result
-    port     = reverse(split(":", module.rabbit_mq.primary_ssl_endpoint))[0]
+
+    port = reverse(split(":", module.rabbit_mq.primary_ssl_endpoint))[0]
   }
 
   redis = var.external_redis != null ? var.external_redis : "rediss://${random_password.redis.result}@${module.elasticache.endpoint}"
@@ -76,7 +77,7 @@ locals {
 
   # Engine service configuration
   engine = {
-    image = "registry.appmixer.com/appmixer-engine:5.2.0-nocomp" # TODO override var
+    image = "registry.appmixer.com/appmixer-engine:5.2.0-nocomp"
     url   = "api.${var.root_dns_name}"
     env = {
       SYSTEM_PLUGINS    = "minio"

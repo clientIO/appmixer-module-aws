@@ -62,8 +62,18 @@ data "aws_ecs_task_execution" "run" {
 
   network_configuration {
     subnets         = local.private_subnet_ids
-    security_groups = [module.ecs_service_engine.security_group_id] # TODO
+    security_groups = [module.sg_user_init.id]
   }
 
   depends_on = [data.http.init_user]
+}
+
+module "sg_user_init" {
+  source           = "cloudposse/security-group/aws"
+  context          = module.label.context
+  attributes       = ["user-init-task"]
+  version          = "2.2.0"
+  enabled          = true
+  vpc_id           = local.vpc_id
+  allow_all_egress = true
 }

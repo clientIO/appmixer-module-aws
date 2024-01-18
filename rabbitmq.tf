@@ -29,7 +29,7 @@ module "rabbit_mq" {
 
   # https://github.com/hashicorp/terraform-provider-aws/issues/33514
   create_security_group           = true
-  allowed_cidr_blocks             = [local.vpc_cidr_block] # TODO join var
+  allowed_cidr_blocks             = [local.vpc_cidr_block]
   additional_security_group_rules = var.additional_security_group_rules
 
   mq_application_password                    = [random_password.rabbit_mq.result]
