@@ -31,14 +31,11 @@ module "elasticache" {
   family                     = try(var.elasticache["family"], null)
   at_rest_encryption_enabled = try(var.elasticache["at_rest_encryption_enabled"], null)
   transit_encryption_enabled = try(var.elasticache["transit_encryption_enabled"], null)
-  auth_token                 = random_password.redis.result
+  auth_token                 = random_password.redis_password.result
   parameter                  = try(var.elasticache["parameter"], null)
 }
 
-resource "random_password" "redis" {
-  keepers = {
-    ami_id = module.label.id
-  }
+resource "random_password" "redis_password" {
   min_upper        = 1
   min_lower        = 1
   min_numeric      = 1
@@ -55,7 +52,7 @@ module "elasticache_ssm_password" {
   parameter_write = [
     {
       name        = "/${module.label.id}/elasticache/auth_token"
-      value       = sensitive(random_password.redis.result)
+      value       = sensitive(random_password.redis_password.result)
       type        = "SecureString"
       overwrite   = "true"
       description = "Auth token for ${module.elasticache.id} Elasticache"

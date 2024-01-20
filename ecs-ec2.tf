@@ -49,7 +49,7 @@ locals {
         ECS_ENABLE_HIGH_DENSITY_ENI=true
         ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
         ECS_ENGINE_AUTH_TYPE=dockercfg
-        ECS_ENGINE_AUTH_DATA=${sensitive(base64decode(var.ecs_auth_data))} # pragma: allowlist secret
+        ECS_ENGINE_AUTH_DATA=${sensitive(base64decode(var.ecs_registry_auth_data))} # pragma: allowlist secret
         EOF
       EOT
 }
@@ -286,7 +286,7 @@ module "ecs_cluster" {
   cluster_name = module.label.id
 
   cluster_configuration = {
-    execute_command_configuration = var.ecs_cluster_configuration
+    execute_command_configuration = var.ecs_cluster_config
   }
 
   cluster_service_connect_defaults = {

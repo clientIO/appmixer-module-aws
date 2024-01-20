@@ -1,6 +1,6 @@
 locals {
   documentdb_enabled    = var.external_documentdb == null
-  documentdb_subnet_ids = slice(local.private_subnet_ids, 0, min(length(local.private_subnet_ids), var.document_db.cluster_size))
+  documentdb_subnet_ids = slice(local.private_subnet_ids, 0, min(length(local.private_subnet_ids), max(2, var.document_db.cluster_size)))
 }
 
 module "documentdb_cluster" {
@@ -19,7 +19,7 @@ module "documentdb_cluster" {
   cluster_size   = try(var.document_db["cluster_size"], null)
   instance_class = try(var.document_db["instance_class"], null)
 
-  master_username = try(var.document_db["master_username"], null)
+  master_username = random_pet.document_db_username.id
 
   engine_version = try(var.document_db["engine_version"], null)
 
@@ -28,6 +28,10 @@ module "documentdb_cluster" {
   allowed_cidr_blocks = [local.vpc_cidr_block]
 
   cluster_parameters = try(var.document_db["cluster_parameters"], [])
+}
+
+resource "random_pet" "document_db_username" {
+  length = 1
 }
 
 module "document_db_ssm_password" {

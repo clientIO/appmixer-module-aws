@@ -1,6 +1,6 @@
 # Basic example
 
-The code in this example shows how to use the module with basic configuration and minimal set of other resources.
+The code in this example shows how to use the module with production configuration and minimal set of other resources.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -14,7 +14,7 @@ The code in this example shows how to use the module with basic configuration an
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_example_module"></a> [example\_module](#module\_example\_module) | ../../ | n/a |
+| <a name="module_appmixer_module"></a> [appmixer\_module](#module\_appmixer\_module) | ../../ | n/a |
 
 ## Resources
 

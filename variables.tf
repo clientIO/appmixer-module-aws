@@ -6,13 +6,13 @@ variable "namespace" {
 
 variable "environment" {
   type        = string
-  default     = "lablabs"
+  default     = "dev"
   description = "Environment, e.g. 'prod', 'staging', 'dev', 'pre-prod', 'UAT'"
 }
 
 variable "stage" {
   type        = string
-  default     = "dev"
+  default     = ""
   description = "Stage, e.g. 'prod', 'staging', 'dev'"
 }
 
@@ -43,7 +43,7 @@ variable "availability_zones" {
 variable "zone_id" {
   type        = string
   default     = ""
-  description = "Route53 DNS zone ID, if not set route53 will be not used"
+  description = "Route53 DNS zone ID, if not set AWS route53 will be not used"
 }
 
 variable "root_dns_name" {
@@ -54,16 +54,15 @@ variable "root_dns_name" {
 variable "certificate_arn" {
   type        = string
   default     = null
-  description = "Certificate ARN, if not set, certificate will be automatically created using '*.<root_dns_name>', zone_id must be set"
+  description = "Certificate ARN, if not set, certificate will be automatically created using '*.<root_dns_name>', `zone_id` must be set"
 }
 
 variable "document_db" {
   type = object({
-    cluster_size    = optional(number, 3)
-    cluster_family  = optional(string, "docdb5.0")
-    instance_class  = optional(string, "db.t4g.medium")
-    engine_version  = optional(string, "5.0.0")
-    master_username = optional(string, "admin1")
+    cluster_size   = optional(number, 1)
+    cluster_family = optional(string, "docdb5.0")
+    instance_class = optional(string, "db.t4g.medium")
+    engine_version = optional(string, "5.0.0")
     cluster_parameters = optional(list(object({
       apply_method = string
       name         = string
@@ -79,7 +78,7 @@ variable "document_db" {
       }
     ]
   }
-  description = "DocumentDB module object"
+  description = "DocumentDB configuration object"
 }
 
 variable "elasticache" {
@@ -96,15 +95,8 @@ variable "elasticache" {
       value = string
     })), [])
   })
-  default = {
-    parameter = [ # TODO remove
-      {
-        name  = "notify-keyspace-events"
-        value = "lK"
-      }
-    ]
-  }
-  description = "Elastic module object"
+  default     = {}
+  description = "Elastic module configuration object"
 }
 
 variable "elasticsearch" {
@@ -122,9 +114,8 @@ variable "elasticsearch" {
       "rest.action.multi.allow_explicit_index" = "true"
     }
   }
-  description = "Elasticsearch module object"
+  description = "Elasticsearch module configuration object"
 }
-
 
 variable "rabbitmq" {
   type = object({
@@ -139,7 +130,7 @@ variable "rabbitmq" {
     publicly_accessible        = optional(bool, false)
   })
   default     = {}
-  description = "RabbitMQ module object"
+  description = "RabbitMQ module configuration object"
 }
 
 variable "init_user" {
@@ -148,10 +139,10 @@ variable "init_user" {
     username = string
     password = string
   })
-  description = "Initial user created in appmixer"
+  description = "Initial user created in appmixer. Creation through appmixer API and by setting up admin scope in documentdb directly"
 }
 
-variable "ecs_auth_data" {
+variable "ecs_registry_auth_data" {
   type        = string
   default     = ""
   description = "Docker registry credentials, base64 encoded string"
@@ -164,7 +155,6 @@ variable "external_redis" {
 }
 
 variable "external_rabbitmq" {
-  # object with url, username, password, port
   type = object({
     url      = string
     username = string
@@ -210,7 +200,7 @@ variable "vpc_config" {
     ipv4_primary_cidr_block = "10.0.0.0/16"
     availability_zones      = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
   }
-  description = "VPC configuration, ignored if external_vpc is set"
+  description = "VPC configuration, ignored if `external_vpc` is set"
 }
 
 variable "additional_security_group_rules" {
@@ -224,7 +214,7 @@ variable "additional_security_group_rules" {
     security_group_id = optional(string)
   }))
   default     = []
-  description = "Additional security group rules added to security group rules of all resources, see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule"
+  description = "Additional security group rules added to security group rules of all resources, see more [Terraform docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule)"
 }
 
 variable "s3_config" {
@@ -238,8 +228,8 @@ variable "s3_config" {
 
 variable "enable_deletion_protection" {
   type        = bool
-  default     = false
-  description = "Enable deletion protection for all resources, if true, resources can't be deleted if not explicitly set to false"
+  default     = true
+  description = "Enable deletion protection for all managed resources, if true, resources can't be deleted if not explicitly set to false"
 }
 
 variable "alb_ingress_security_group_rules" {
@@ -269,7 +259,7 @@ variable "alb_ingress_security_group_rules" {
   description = "Application Load Balancer security group ingress rules"
 }
 
-variable "ecs_cluster_configuration" {
+variable "ecs_cluster_config" {
   type = any
   default = {
     logging = "OVERRIDE"
@@ -277,13 +267,12 @@ variable "ecs_cluster_configuration" {
       cloud_watch_log_group_name = "/aws/ecs/aws-ec2"
     }
   }
-  description = "Cluster configuration object 'execute_command_configuration',  see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster"
+  description = "Cluster configuration object `execute_command_configuration`,  see more [terraform docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster)"
 }
 
 variable "ecs_autoscaling_config" {
   type = any
   default = {
-    # On-demand instances
     on_demand = {
       instance_type              = "m5.large"
       use_mixed_instances_policy = true
@@ -378,9 +367,9 @@ variable "ecs_common_service_config" {
   default     = {}
   description = <<EOF
     ECS service configuration:
-    ordered_placement_strategy defines how tasks are placed on instances, see more https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html or https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service
-    force_new_deployment force service redeployment
-    wait_for_steady_state terraform apply waits for service to reach steady state, see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service
+    - `ordered_placement_strategy` defines how tasks are placed on instances, see more [AWS docs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html) or [Terraform docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
+    - `force_new_deployment` force service redeployment
+    - `wait_for_steady_state` terraform apply waits for service to reach steady state, see more [Terraform docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
 EOF
 }
 
@@ -401,18 +390,11 @@ variable "ecs_per_service_config" {
         cpu          = 512
         memory       = 1024
         health_check = {}
-        entrypoint = [
-          "node",
-          "gridd.js",
-          "--http",
-          "--emails"
-        ]
+        entrypoint = [ "node", "gridd.js", "--http", "--emails" ]
         autoscaling_min_capacity = 1
         autoscaling_max_capacity = 10
-
         force_new_deployment = true
         wait_for_steady_state = true
-
         # (see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
         ordered_placement_strategy = [{
           type  = "binpack"
@@ -424,13 +406,12 @@ variable "ecs_per_service_config" {
       backoffice = {...}
       logstash = {
         health_check = {
-          {
             retries = 10
             command = ["CMD-SHELL", "curl -s -XGET localhost:9600 || exit 1"]
             timeout : 5
             interval : 10
             startPeriod : 60
-          }
+        }
         }
       }
     }

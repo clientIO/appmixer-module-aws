@@ -9,12 +9,12 @@ locals {
     port = reverse(split(":", module.rabbit_mq.primary_ssl_endpoint))[0]
   }
 
-  redis = var.external_redis != null ? var.external_redis : "rediss://${random_password.redis.result}@${module.elasticache.endpoint}"
+  redis = var.external_redis != null ? var.external_redis : "rediss://${random_password.redis_password.result}@${module.elasticache.endpoint}"
 
   elasticsearch = var.external_elasticsearch != null ? var.external_elasticsearch : {
     url      = trimprefix(module.elasticsearch.domain_endpoint, "https://")
     username = local.elasticsearch_master_username
-    password = random_password.elasticsearch.result
+    password = random_password.elasticsearch_password.result
   }
 
   documentdb = var.external_documentdb != null ? var.external_documentdb : "mongodb://${module.documentdb_cluster.master_username}:${module.documentdb_cluster.master_password}@${module.documentdb_cluster.endpoint}:27017/appmixer?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
@@ -87,6 +87,9 @@ locals {
       MINIO_USE_SSL     = true
       MINIO_REGION      = data.aws_region.current.name
       MINIO_BUCKET_NAME = module.s3_bucket.bucket_id
+      DB_TLS_CA_FILE    = "/etc/certificates/global-bundle.pem"
+      DB_USE_TLS        = "true"
+      DB_SSL_VALIDATE   = "true"
     }
     cpu          = 512
     memory       = 1024
@@ -115,7 +118,7 @@ locals {
     rabbitmq_password      = local.rabbitmq.password
     elasticsearch_host     = "https://${module.elasticsearch.domain_endpoint}:443"
     elasticsearch_user     = local.elasticsearch_master_username
-    elasticsearch_password = random_password.elasticsearch.result
+    elasticsearch_password = random_password.elasticsearch_password.result
   }
   logstash = {
     image = "opensearchproject/logstash-oss-with-opensearch-output-plugin:8.9.0"

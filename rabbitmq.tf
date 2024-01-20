@@ -2,6 +2,7 @@ locals {
   rabbitmq_enabled         = var.external_rabbitmq == null
   rabbitmq_deployment_mode = try(var.rabbitmq["deployment_mode"], "SINGLE_INSTANCE")
   rabbitmq_subnet_ids      = local.rabbitmq_deployment_mode == "SINGLE_INSTANCE" ? [local.private_subnet_ids[0]] : local.private_subnet_ids
+  rabbitmq_ssm             = "${module.label.id}/rabbit_mq"
 }
 module "rabbit_mq" {
   source  = "cloudposse/mq-broker/aws"
@@ -28,20 +29,18 @@ module "rabbit_mq" {
   use_aws_owned_key   = try(var.rabbitmq["use_aws_owned_key"], null)
 
   # https://github.com/hashicorp/terraform-provider-aws/issues/33514
-  create_security_group           = true
-  allowed_cidr_blocks             = [local.vpc_cidr_block]
+  create_security_group = true
+  allowed_cidr_blocks   = [local.vpc_cidr_block]
+
   additional_security_group_rules = var.additional_security_group_rules
 
   mq_application_password                    = [random_password.rabbit_mq.result]
-  ssm_path                                   = "${module.label.id}/rabbit_mq"
+  ssm_path                                   = local.rabbitmq_ssm
   mq_application_user_ssm_parameter_name     = "master_username"
   mq_application_password_ssm_parameter_name = "master_password" # pragma: allowlist secret
 }
 
 resource "random_password" "rabbit_mq" {
-  keepers = {
-    ami_id = module.label.id
-  }
   min_upper   = 1
   min_lower   = 1
   min_numeric = 1

@@ -1,9 +1,14 @@
 locals {
   vpc_enabled        = var.external_vpc == null
   vpc_id             = !local.vpc_enabled ? var.external_vpc.vpc_id : module.vpc.vpc_id
-  vpc_cidr_block     = !local.vpc_enabled ? var.external_vpc.vpc_cidr_block : module.vpc.vpc_cidr_block
+  vpc_cidr_block     = !local.vpc_enabled ? data.aws_vpc.external[0].cidr_block : module.vpc.vpc_cidr_block
   public_subnet_ids  = !local.vpc_enabled ? var.external_vpc.public_subnet_ids : module.subnets.public_subnet_ids
   private_subnet_ids = !local.vpc_enabled ? var.external_vpc.private_subnet_ids : module.subnets.private_subnet_ids
+}
+
+data "aws_vpc" "external" {
+  count = local.vpc_enabled ? 0 : 1
+  id    = local.vpc_id
 }
 
 module "vpc" {

@@ -1,5 +1,5 @@
 locals {
-  elasticsearch_master_username = random_pet.elasticsearch.id
+  elasticsearch_master_username = random_pet.elasticsearch_username.id
   elasticsearch_enabled         = var.external_elasticsearch == null
   elasticsearch_subnet_ids      = slice(local.private_subnet_ids, 0, min(length(local.private_subnet_ids), var.elasticsearch.instance_count))
 }
@@ -37,9 +37,9 @@ module "elasticsearch" {
   advanced_security_options_enabled                        = true
   advanced_security_options_internal_user_database_enabled = true
   advanced_security_options_master_user_name               = local.elasticsearch_master_username
-  advanced_security_options_master_user_password           = random_password.elasticsearch.result
+  advanced_security_options_master_user_password           = random_password.elasticsearch_password.result
 }
-resource "random_password" "elasticsearch" {
+resource "random_password" "elasticsearch_password" {
   min_upper        = 1
   min_lower        = 1
   min_numeric      = 1
@@ -48,7 +48,8 @@ resource "random_password" "elasticsearch" {
   length           = 16
 }
 
-resource "random_pet" "elasticsearch" {
+resource "random_pet" "elasticsearch_username" {
+  length = 1
 }
 
 
@@ -61,7 +62,7 @@ module "elasticsearch_ssm_password" {
   parameter_write = [
     {
       name        = "/${module.label.id}/elasticsearch/master_password"
-      value       = sensitive(random_password.elasticsearch.result)
+      value       = sensitive(random_password.elasticsearch_password.result)
       type        = "SecureString"
       overwrite   = "true"
       description = "Master password for Elasticsearch ${module.elasticsearch.domain_name} "

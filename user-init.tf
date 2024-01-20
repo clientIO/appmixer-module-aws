@@ -5,7 +5,7 @@ locals {
 }
 
 data "http" "init_user" {
-  url = "https://api.${var.root_dns_name}/user"
+  url = "https://${local.engine.url}/user"
 
   method = "POST"
   request_headers = {
@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "this" {
       memory     = 512
       essential  = true
       entryPoint = ["mongosh"]
-      command    = ["appmixer", "--host", "cio-lablabs-dev-appmixer-documentdb.cluster-c5cjg1za18ax.eu-central-1.docdb.amazonaws.com:27017", "--username", module.documentdb_cluster.master_username, "--password", module.documentdb_cluster.master_password, "--retryWrites=false", "--eval", "db.users.updateOne({ email: \"${local.email}\"},{$set: {scope: [\"user\",\"admin\"]}});"]
+      command    = ["appmixer", "--host", "${module.documentdb_cluster.endpoint}:27017", "--username", module.documentdb_cluster.master_username, "--password", module.documentdb_cluster.master_password, "--retryWrites=false", "--eval", "db.users.updateOne({ email: \"${local.email}\"},{$set: {scope: [\"user\",\"admin\"]}});"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {

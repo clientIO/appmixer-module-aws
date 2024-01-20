@@ -1,6 +1,6 @@
 # Basic example
 
-The code in this example shows how to use the module with basic configuration and minimal set of other resources.
+The code in this example shows how to use the module with development configuration and minimal set of other resources.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -14,7 +14,9 @@ The code in this example shows how to use the module with basic configuration an
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_example_module"></a> [example\_module](#module\_example\_module) | ../../ | n/a |
+| <a name="module_appmixer_module"></a> [appmixer\_module](#module\_appmixer\_module) | ../../ | n/a |
+| <a name="module_subnets"></a> [subnets](#module\_subnets) | cloudposse/dynamic-subnets/aws | 2.4.1 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | cloudposse/vpc/aws | 2.1.1 |
 
 ## Resources
 
@@ -26,5 +28,7 @@ No inputs.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_appmixer_module"></a> [appmixer\_module](#output\_appmixer\_module) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
