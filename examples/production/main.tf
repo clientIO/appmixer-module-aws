@@ -1,9 +1,16 @@
 locals {
+  name               = "appmixer"
+  environment        = "prod"
+  namespace          = "cio"
   availability_zones = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 }
 
 module "appmixer_module" {
   source = "../../"
+
+  name        = local.name
+  namespace   = local.namespace
+  environment = local.environment
 
   root_dns_name = "ecs.appmixer.co"
   zone_id       = "XXX"
@@ -23,7 +30,7 @@ module "appmixer_module" {
 
   ecs_common_service_config = {
     wait_for_steady_state    = true
-    autoscaling_min_capacity = 2
+    autoscaling_min_capacity = 2 # Minimum number of tasks to run
     ordered_placement_strategy = [
       # This `spread` placement strategy will ensure that the tasks are spread across Availability Zones which implies higher availability.
       {
@@ -59,7 +66,7 @@ module "appmixer_module" {
         ]
       }
 
-      max_size = 2
+      max_size = 4
       min_size = 1
       capacity_provider = {
         maximum_scaling_step_size = 1
@@ -91,7 +98,7 @@ module "appmixer_module" {
           }
         ]
       }
-      max_size = 2
+      max_size = 4
       min_size = 1
       capacity_provider = {
         maximum_scaling_step_size = 1

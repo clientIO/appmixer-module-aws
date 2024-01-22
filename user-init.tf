@@ -1,22 +1,35 @@
 locals {
-  email    = var.init_user["email"]
-  username = var.init_user["username"]
-  password = var.init_user["password"]
+  user_init_enabled           = var.init_user != null
+  user_init_email             = try(var.init_user.email, "")
+  user_init_username          = try(var.init_user.username, "")
+  user_init_password          = try(var.init_user.password, "")
+  user_init_max_retry_minutes = try(var.init_user.max_retry_minutes, 10)
+  user_init_mongo_task        = local.user_init_enabled && var.external_documentdb == null
 }
 
 data "http" "init_user" {
-  url = "https://${local.engine.url}/user"
+  count = local.user_init_enabled ? 1 : 0
+  url   = "https://${local.engine.url}/user"
 
   method = "POST"
   request_headers = {
     content-type = "application/json"
   }
-  request_body = jsonencode({ "email" : local.email, "username" : local.username, "password" : local.password })
+  request_body = jsonencode({ "email" : local.user_init_email, "username" : local.user_init_username, "password" : local.user_init_password })
   depends_on   = [module.ecs_service_engine]
-}
 
-output "user" {
-  value = jsondecode(data.http.init_user.response_body)
+  retry {
+    attempts     = local.user_init_max_retry_minutes
+    min_delay_ms = 60000
+    max_delay_ms = 60000
+  }
+
+  lifecycle {
+    postcondition {
+      condition     = contains([201, 400], self.status_code)
+      error_message = "Service engine not available (${local.engine.url}), try it again later. (Response: ${self.response_body})"
+    }
+  }
 }
 
 resource "aws_cloudwatch_log_group" "ecs_mongo_init_user" {
@@ -26,8 +39,8 @@ resource "aws_cloudwatch_log_group" "ecs_mongo_init_user" {
   retention_in_days = 7
 }
 
-
 resource "aws_ecs_task_definition" "this" {
+  count  = local.user_init_mongo_task ? 1 : 0
   family = "${module.label.id}-mongo-init-user"
   container_definitions = jsonencode([
     {
@@ -36,8 +49,7 @@ resource "aws_ecs_task_definition" "this" {
       cpu        = 10
       memory     = 512
       essential  = true
-      entryPoint = ["mongosh"]
-      command    = ["appmixer", "--host", "${module.documentdb_cluster.endpoint}:27017", "--username", module.documentdb_cluster.master_username, "--password", module.documentdb_cluster.master_password, "--retryWrites=false", "--eval", "db.users.updateOne({ email: \"${local.email}\"},{$set: {scope: [\"user\",\"admin\"]}});"]
+      entryPoint = ["/bin/bash", "-c", "apt-get update --allow-insecure-repositories; apt-get install wget; wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem;  mongosh appmixer --host ${module.documentdb_cluster.endpoint}:27017 --username ${module.documentdb_cluster.master_username} --password ${module.documentdb_cluster.master_password} --retryWrites=false --eval 'db.users.updateOne({ email: \"${local.user_init_email}\"},{$set: {scope: [\"user\",\"admin\"]}});' --tls --tlsCAFile global-bundle.pem"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -55,8 +67,9 @@ resource "aws_ecs_task_definition" "this" {
 
 # tflint-ignore: terraform_unused_declarations
 data "aws_ecs_task_execution" "run" {
+  count           = local.user_init_mongo_task ? 1 : 0
   cluster         = module.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.this.arn
+  task_definition = aws_ecs_task_definition.this[0].arn
   desired_count   = 1
   launch_type     = "EC2"
 
@@ -65,7 +78,7 @@ data "aws_ecs_task_execution" "run" {
     security_groups = [module.sg_user_init.id]
   }
 
-  depends_on = [data.http.init_user]
+  depends_on = [data.http.init_user[0]]
 }
 
 module "sg_user_init" {

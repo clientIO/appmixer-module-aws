@@ -34,7 +34,7 @@ module "appmixer_module" {
   source = "../../"
 
   name        = local.name
-  namespace   = local.environment
+  namespace   = local.namespace
   environment = local.environment
 
   root_dns_name = "ecs.appmixer.co"
@@ -133,14 +133,10 @@ module "appmixer_module" {
   }
 
   ecs_common_service_config = {
-    autoscaling_min_capacity = 2
+    autoscaling_min_capacity = 1
     wait_for_steady_state    = true
-    force_new_deployment     = true
-    ordered_placement_strategy = [
-      {
-        type  = "spread"
-        field = "attribute:ecs.availability-zone"
-      },
+    force_new_deployment     = false
+    ordered_placement_strategy = [ # (see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
       {
         type  = "binpack"
         field = "cpu"
@@ -148,14 +144,11 @@ module "appmixer_module" {
     ]
   }
 
-  # Mongo DB TLS temporary disabled - to enable just remove env variables below
+  # Engine fix to use MongoDB TLS
   ecs_per_service_config = {
     engine = {
-      env = {
-        DB_SSL_VALIDATE = "false"
-        DB_USE_TLS      = "false"
-        DB_TLS_CA_FILE  = ""
-      }
+      entrypoint = ["/bin/bash", "-c"]
+      command    = ["apt-get update; apt-get install wget; wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; node gridd.js --http --emails"]
     }
   }
 }

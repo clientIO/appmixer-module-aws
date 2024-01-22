@@ -69,15 +69,7 @@ variable "document_db" {
       value        = string
     })), [])
   })
-  default = {
-    cluster_parameters = [
-      {
-        apply_method = "pending-reboot"
-        name         = "tls"
-        value        = "disabled"
-      }
-    ]
-  }
+  default     = {}
   description = "DocumentDB configuration object"
 }
 
@@ -135,10 +127,12 @@ variable "rabbitmq" {
 
 variable "init_user" {
   type = object({
-    email    = string
-    username = string
-    password = string
+    email             = optional(string, "")
+    username          = optional(string, "")
+    password          = optional(string, "")
+    max_retry_minutes = optional(number, 45)
   })
+  default     = null
   description = "Initial user created in appmixer. Creation through appmixer API and by setting up admin scope in documentdb directly"
 }
 
@@ -395,7 +389,6 @@ variable "ecs_per_service_config" {
         autoscaling_max_capacity = 10
         force_new_deployment = true
         wait_for_steady_state = true
-        # (see more https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service)
         ordered_placement_strategy = [{
           type  = "binpack"
           field = "cpu"
@@ -404,15 +397,7 @@ variable "ecs_per_service_config" {
       quota = {...}
       frontend = {...}
       backoffice = {...}
-      logstash = {
-        health_check = {
-            retries = 10
-            command = ["CMD-SHELL", "curl -s -XGET localhost:9600 || exit 1"]
-            timeout : 5
-            interval : 10
-            startPeriod : 60
-        }
-        }
+      logstash = {...}
       }
     }
     ```

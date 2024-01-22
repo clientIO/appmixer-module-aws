@@ -169,14 +169,14 @@ module "alb" {
 
       health_check = {
         enabled             = true
-        healthy_threshold   = 10
-        interval            = 240
+        healthy_threshold   = 5
+        interval            = 30
         matcher             = "200"
         path                = "/"
         port                = "traffic-port"
         protocol            = "HTTP"
-        timeout             = 120
-        unhealthy_threshold = 10
+        timeout             = 5
+        unhealthy_threshold = 2
       }
       create_attachment = false
     }
@@ -358,6 +358,8 @@ module "ecs_service_backoffice" {
       ]
       environment  = local.backoffice_env_container
       health_check = module.services_configuration_merge.merged.backoffice.health_check
+      command      = module.services_configuration_merge.merged.backoffice.command
+      entrypoint   = module.services_configuration_merge.merged.backoffice.entrypoint
     }
   }
 
@@ -446,6 +448,7 @@ module "ecs_service_engine" {
       ]
       environment  = local.engine_env_container
       entrypoint   = module.services_configuration_merge.merged.engine.entrypoint
+      command      = module.services_configuration_merge.merged.engine.command
       health_check = module.services_configuration_merge.merged.engine.health_check
     }
   }
@@ -537,6 +540,7 @@ module "ecs_service_quota" {
       environment  = local.quota_env_continer
       health_check = module.services_configuration_merge.merged.quota.health_check
       entrypoint   = module.services_configuration_merge.merged.quota.entrypoint
+      command      = module.services_configuration_merge.merged.quota.command
     }
   }
 
@@ -619,6 +623,7 @@ module "ecs_service_frontend" {
       environment  = local.frontend_env_container
       health_check = module.services_configuration_merge.merged.frontend.health_check
       entrypoint   = module.services_configuration_merge.merged.frontend.entrypoint
+      command      = module.services_configuration_merge.merged.frontend.command
     }
   }
 
@@ -687,6 +692,7 @@ module "ecs_service_logstash" {
       entrypoint   = module.services_configuration_merge.merged.logstash.entrypoint
       environment  = local.logstash_env_container
       health_check = module.services_configuration_merge.merged.logstash.health_check
+      command      = module.services_configuration_merge.merged.logstash.command
     }
   }
 

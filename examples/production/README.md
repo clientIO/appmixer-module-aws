@@ -1,6 +1,6 @@
 # Basic example
 
-The code in this example shows how to use the module with production configuration and minimal set of other resources.
+The code in this example shows how to use the module with production configuration and high availability configuration.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

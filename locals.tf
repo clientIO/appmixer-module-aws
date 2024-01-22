@@ -43,6 +43,7 @@ locals {
     ordered_placement_strategy = var.ecs_common_service_config.ordered_placement_strategy
     health_check               = {}
     entrypoint                 = []
+    command                    = []
     autoscaling_min_capacity   = var.ecs_common_service_config.autoscaling_min_capacity
     autoscaling_max_capacity   = var.ecs_common_service_config.autoscaling_max_capacity
     deployment_circuit_breaker = var.ecs_common_service_config.deployment_circuit_breaker
@@ -87,7 +88,7 @@ locals {
       MINIO_USE_SSL     = true
       MINIO_REGION      = data.aws_region.current.name
       MINIO_BUCKET_NAME = module.s3_bucket.bucket_id
-      DB_TLS_CA_FILE    = "/etc/certificates/global-bundle.pem"
+      DB_TLS_CA_FILE    = "global-bundle.pem"
       DB_USE_TLS        = "true"
       DB_SSL_VALIDATE   = "true"
     }
