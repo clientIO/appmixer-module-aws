@@ -136,7 +136,9 @@ locals {
       interval : 10
       startPeriod : 60
     }
-    entrypoint = ["/bin/sh", "-c", "printenv LOGSTASH_YML > /usr/share/logstash/config/logstash.yml; printenv LOGSTASH_CONF > /usr/share/logstash/pipeline/logstash.conf; /usr/local/bin/docker-entrypoint;"]
+    entrypoint               = ["/bin/sh", "-c", "printenv LOGSTASH_YML > /usr/share/logstash/config/logstash.yml; printenv LOGSTASH_CONF > /usr/share/logstash/pipeline/logstash.conf; /usr/local/bin/docker-entrypoint;"]
+    autoscaling_max_capacity = 1
+    autoscaling_min_capacity = 1
   }
 
 }
