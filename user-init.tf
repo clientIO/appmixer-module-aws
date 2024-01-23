@@ -3,7 +3,7 @@ locals {
   user_init_email             = try(var.init_user.email, "")
   user_init_username          = try(var.init_user.username, "")
   user_init_password          = try(var.init_user.password, "")
-  user_init_max_retry_minutes = try(var.init_user.max_retry_minutes, 10)
+  user_init_max_retry_minutes = try(var.init_user.max_retry_minutes, 45)
   user_init_mongo_task        = local.user_init_enabled && var.external_documentdb == null
 }
 
