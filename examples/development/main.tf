@@ -29,6 +29,9 @@ module "subnets" {
   availability_zones  = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 }
 
+data "aws_route53_zone" "this" {
+  name = "appmixer.co"
+}
 
 module "appmixer_module" {
   source = "../../"
@@ -37,8 +40,8 @@ module "appmixer_module" {
   namespace   = local.namespace
   environment = local.environment
 
-  root_dns_name = "ecs.appmixer.co"
-  zone_id       = "XXX"
+  root_dns_name = "ecs.${data.aws_route53_zone.this.name}"
+  zone_id       = data.aws_route53_zone.this.zone_id
 
   external_vpc = {
     vpc_id             = module.vpc.vpc_id
