@@ -1,6 +1,6 @@
-### ALB, ECS
 output "alb_dns_name" {
-  value = module.alb.dns_name
+  value       = module.alb.dns_name
+  description = "DNS name of the ALB"
 }
 
 output "services_urls" {
@@ -9,6 +9,7 @@ output "services_urls" {
     frontend   = local.frontend.url
     engine     = local.engine.url
   }
+  description = "URLs of the running services"
 }
 output "vpc_config" {
   value = {
@@ -17,6 +18,7 @@ output "vpc_config" {
     public_subnets  = local.public_subnet_ids
     private_subnets = local.private_subnet_ids
   }
+  description = "VPC configuration contaning VPC ID, CIDR block and subnets"
 }
 
 output "managed_services" {
@@ -50,4 +52,5 @@ output "managed_services" {
 
     }
   }
+  description = "Managed services configuration containing endpoints and name of SSM parameters with credentials"
 }

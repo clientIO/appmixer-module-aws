@@ -152,10 +152,10 @@ See [Production example](examples/production/README.md) for further information.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | ## ALB, ECS |
-| <a name="output_managed_services"></a> [managed\_services](#output\_managed\_services) | n/a |
-| <a name="output_services_urls"></a> [services\_urls](#output\_services\_urls) | n/a |
-| <a name="output_vpc_config"></a> [vpc\_config](#output\_vpc\_config) | n/a |
+| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | DNS name of the ALB |
+| <a name="output_managed_services"></a> [managed\_services](#output\_managed\_services) | Managed services configuration containing endpoints and name of SSM parameters with credentials |
+| <a name="output_services_urls"></a> [services\_urls](#output\_services\_urls) | URLs of the running services |
+| <a name="output_vpc_config"></a> [vpc\_config](#output\_vpc\_config) | VPC configuration contaning VPC ID, CIDR block and subnets |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Contributing and reporting issues
