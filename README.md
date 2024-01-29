@@ -45,7 +45,7 @@ Admin user is initialized through automated task running in ECS. Variable `init_
 - See [Production example](examples/production/README.md) for further information. (High available setup)
 
 ## Pricing
-[AWS Pricing estimation](https://calculator.aws/#/estimate?id=e7ef36a5f2d80b239f143a9b0fb4dfaf935e00d4) for each environemnt.
+[AWS Pricing estimation](https://calculator.aws/#/estimate?id=255bd4b7f28f0aadd6dcc8e746b475ea18fd2779) for each environemnt.
 Pricing can vary based on real traffic.
 
 - Development ~ 450$/month
