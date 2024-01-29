@@ -59,14 +59,7 @@ module "appmixer_module" {
 
   enable_deletion_protection = false
 
-  elasticache = {
-    parameter = [
-      {
-        name  = "notify-keyspace-events"
-        value = "lK"
-      }
-    ]
-  }
+
   ecs_autoscaling_config = {
     on_demand = {
       instance_type              = "m5.large"
@@ -157,6 +150,28 @@ module "appmixer_module" {
       entrypoint = ["/bin/bash", "-c"]
       command    = ["apt-get update; apt-get -y install wget; wget -O /root//global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; npm start"]
     }
+  }
+
+  elasticsearch = {
+    instance_count = 1
+  }
+
+  elasticache = {
+    cluster_size = 1
+    parameter = [
+      {
+        name  = "notify-keyspace-events"
+        value = "lK"
+      }
+    ]
+  }
+
+  document_db = {
+    cluster_size = 1
+  }
+
+  rabbitmq = {
+    deployment_mode = "SINGLE_INSTANCE"
   }
 }
 
