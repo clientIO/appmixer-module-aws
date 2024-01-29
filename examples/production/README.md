@@ -18,7 +18,9 @@ The code in this example shows how to use the module with production configurati
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [aws_route53_zone.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 

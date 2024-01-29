@@ -5,6 +5,10 @@ locals {
   availability_zones = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 }
 
+data "aws_route53_zone" "this" {
+  name = "appmixer.co"
+}
+
 module "appmixer_module" {
   source = "../../"
 
@@ -12,8 +16,8 @@ module "appmixer_module" {
   namespace   = local.namespace
   environment = local.environment
 
-  root_dns_name = "ecs.appmixer.co"
-  zone_id       = "XXX"
+  root_dns_name = "ecs-prod.appmixer.co"
+  zone_id       = data.aws_route53_zone.this.zone_id
 
   vpc_config = {
     ipv4_primary_cidr_block = "10.0.0.0/16"
