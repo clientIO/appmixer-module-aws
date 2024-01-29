@@ -117,11 +117,17 @@ module "appmixer_module" {
   }
 
   elasticache = {
-    cluster_size = length(local.availability_zones)
+    cluster_size  = 2
+    instance_type = "cache.t3.medium"
   }
 
   document_db = {
     cluster_size = length(local.availability_zones)
+  }
+
+  rabbitmq = {
+    deployment_mode    = "CLUSTER_MULTI_AZ"
+    host_instance_type = "mq.m5.large"
   }
 
 

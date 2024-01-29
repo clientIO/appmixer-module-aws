@@ -41,8 +41,22 @@ Admin user is initialized through automated task running in ECS. Variable `init_
 
 
 ## Examples
-See [Development example](examples/development/README.md) for further information. (Minimal setup)
-See [Production example](examples/production/README.md) for further information. (High available setup)
+- See [Development example](examples/development/README.md) for further information. (Minimal setup)
+- See [Production example](examples/production/README.md) for further information. (High available setup)
+
+## Pricing
+[AWS Pricing estimation](https://calculator.aws/#/estimate?id=e7ef36a5f2d80b239f143a9b0fb4dfaf935e00d4) for each environemnt.
+Pricing can vary based on real traffic.
+
+- Development ~ 450$/month
+- Production  ~ 900$/month
+
+## Simple VPN
+You can use [sshuttle](https://github.com/sshuttle/sshuttle) to connect to private VPC network.
+1. Run EC2 with configured SSH keys in your public subnet
+2. Install `sshuttle`
+3. Connect through `sshuttle` to your running EC2 (`sshuttle -r <SSH_CONFIG> 0.0.0.0/0 -vv`)
+4. Your network traffic should be routed through EC2, you should be able to see managed AWS services running in private subnets.
 
 
 ## Architecture
