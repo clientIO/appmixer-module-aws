@@ -105,8 +105,12 @@ locals {
 
   # Quota service configuration
   quota = {
-    image  = "registry.appmixer.com/appmixer-quota:5.2.0"
-    env    = {}
+    image = "registry.appmixer.com/appmixer-quota:5.2.0"
+    env = {
+      DB_TLS_CA_FILE  = "/root/global-bundle.pem"
+      DB_USE_TLS      = "true"
+      DB_SSL_VALIDATE = "true"
+    }
     cpu    = 256
     memory = 512
   }

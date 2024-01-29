@@ -151,7 +151,11 @@ module "appmixer_module" {
   ecs_per_service_config = {
     engine = {
       entrypoint = ["/bin/bash", "-c"]
-      command    = ["apt-get update; apt-get install wget; wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; node gridd.js --http --emails"]
+      command    = ["apt-get update; apt-get -y install wget; wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; node gridd.js --http --emails"]
+    }
+    quota = {
+      entrypoint = ["/bin/bash", "-c"]
+      command    = ["apt-get update; apt-get -y install wget; wget -O /root//global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; npm start"]
     }
   }
 }
