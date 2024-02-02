@@ -42,7 +42,7 @@ variable "availability_zones" {
 
 variable "zone_id" {
   type        = string
-  default     = ""
+  default     = null
   description = "Route53 DNS zone ID, if not set AWS route53 will be not used"
 }
 
@@ -54,7 +54,7 @@ variable "root_dns_name" {
 variable "certificate_arn" {
   type        = string
   default     = null
-  description = "Certificate ARN, if not set, certificate will be automatically created using '*.<root_dns_name>', `zone_id` must be set"
+  description = "Certificate ARN, if not set, certificate will be automatically created using '*.<root_dns_name>'"
 }
 
 variable "document_db" {

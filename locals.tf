@@ -17,7 +17,7 @@ locals {
     password = random_password.elasticsearch_password.result
   }
 
-  documentdb = var.external_documentdb != null ? var.external_documentdb : "mongodb://${module.documentdb_cluster.master_username}:${module.documentdb_cluster.master_password}@${module.documentdb_cluster.endpoint}:27017/appmixer?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+  documentdb = var.external_documentdb != null ? var.external_documentdb : "mongodb://${module.documentdb_cluster.master_username}:${module.documentdb_cluster.master_password}@${module.documentdb_cluster.endpoint}:27017/appmixer?replicaSet=rs0&readPreference=primaryPreferred&retryWrites=false"
 
   ## Services default configuration
 
@@ -105,8 +105,12 @@ locals {
 
   # Quota service configuration
   quota = {
-    image  = "registry.appmixer.com/appmixer-quota:5.2.0"
-    env    = {}
+    image = "registry.appmixer.com/appmixer-quota:5.2.0"
+    env = {
+      DB_TLS_CA_FILE  = "/root/global-bundle.pem"
+      DB_USE_TLS      = "true"
+      DB_SSL_VALIDATE = "true"
+    }
     cpu    = 256
     memory = 512
   }

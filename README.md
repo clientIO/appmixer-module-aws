@@ -41,8 +41,22 @@ Admin user is initialized through automated task running in ECS. Variable `init_
 
 
 ## Examples
-See [Development example](examples/development/README.md) for further information. (Minimal setup)
-See [Production example](examples/production/README.md) for further information. (High available setup)
+- See [Development example](examples/development/README.md) for further information. (Minimal setup)
+- See [Production example](examples/production/README.md) for further information. (High available setup)
+
+## Pricing
+[AWS Pricing estimation](https://calculator.aws/#/estimate?id=255bd4b7f28f0aadd6dcc8e746b475ea18fd2779) for each environemnt.
+Pricing can vary based on real traffic.
+
+- Development ~ 450$/month
+- Production  ~ 900$/month
+
+## Simple VPN
+You can use [sshuttle](https://github.com/sshuttle/sshuttle) to connect to private VPC network.
+1. Run EC2 with configured SSH keys in your public subnet
+2. Install `sshuttle`
+3. Connect through `sshuttle` to your running EC2 (`sshuttle -r <SSH_CONFIG> 0.0.0.0/0 -vv`)
+4. Your network traffic should be routed through EC2, you should be able to see managed AWS services running in private subnets.
 
 
 ## Architecture
@@ -122,7 +136,7 @@ See [Production example](examples/production/README.md) for further information.
 | <a name="input_alb_ingress_security_group_rules"></a> [alb\_ingress\_security\_group\_rules](#input\_alb\_ingress\_security\_group\_rules) | Application Load Balancer security group ingress rules | <pre>map(object({<br>    ip_protocol                  = string<br>    from_port                    = optional(number)<br>    to_port                      = optional(number)<br>    referenced_security_group_id = optional(string)<br>    description                  = optional(string)<br>    cidr_ipv4                    = optional(string)<br>    cidr_ipv6                    = optional(string)<br>  }))</pre> | <pre>{<br>  "all_http": {<br>    "cidr_ipv4": "0.0.0.0/0",<br>    "from_port": 80,<br>    "ip_protocol": "tcp",<br>    "to_port": 80<br>  },<br>  "all_https": {<br>    "cidr_ipv4": "0.0.0.0/0",<br>    "from_port": 443,<br>    "ip_protocol": "tcp",<br>    "to_port": 443<br>  }<br>}</pre> | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | Additional attributes (e.g. `1`) | `list(string)` | `[]` | no |
 | <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | List of availability zones | `list(string)` | <pre>[<br>  "eu-central-1a",<br>  "eu-central-1b",<br>  "eu-central-1c"<br>]</pre> | no |
-| <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | Certificate ARN, if not set, certificate will be automatically created using '*.<root\_dns\_name>', `zone_id` must be set | `string` | `null` | no |
+| <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | Certificate ARN, if not set, certificate will be automatically created using '*.<root\_dns\_name>' | `string` | `null` | no |
 | <a name="input_document_db"></a> [document\_db](#input\_document\_db) | DocumentDB configuration object | <pre>object({<br>    cluster_size   = optional(number, 1)<br>    cluster_family = optional(string, "docdb5.0")<br>    instance_class = optional(string, "db.t4g.medium")<br>    engine_version = optional(string, "5.0.0")<br>    cluster_parameters = optional(list(object({<br>      apply_method = string<br>      name         = string<br>      value        = string<br>    })), [])<br>  })</pre> | `{}` | no |
 | <a name="input_ecs_autoscaling_config"></a> [ecs\_autoscaling\_config](#input\_ecs\_autoscaling\_config) | n/a | `any` | <pre>{<br>  "on_demand": {<br>    "capacity_provider": {<br>      "default_capacity_provider_strategy": {<br>        "base": 1,<br>        "weight": 10<br>      },<br>      "maximum_scaling_step_size": 5,<br>      "minimum_scaling_step_size": 1,<br>      "target_capacity": 100<br>    },<br>    "instance_type": "m5.large",<br>    "max_size": 6,<br>    "min_size": 1,<br>    "mixed_instances_policy": {<br>      "instances_distribution": {<br>        "on_demand_allocation_strategy": "prioritized",<br>        "on_demand_base_capacity": 1,<br>        "on_demand_percentage_above_base_capacity": 100,<br>        "spot_allocation_strategy": "lowest-price"<br>      },<br>      "override": [<br>        {<br>          "instance_type": "m5.large",<br>          "weighted_capacity": "1"<br>        },<br>        {<br>          "instance_type": "c5.large",<br>          "weighted_capacity": "1"<br>        }<br>      ]<br>    },<br>    "use_mixed_instances_policy": true<br>  },<br>  "spot": {<br>    "capacity_provider": {<br>      "default_capacity_provider_strategy": {<br>        "base": 0,<br>        "weight": 80<br>      },<br>      "maximum_scaling_step_size": 5,<br>      "minimum_scaling_step_size": 1,<br>      "target_capacity": 100<br>    },<br>    "instance_type": "m5.large",<br>    "max_size": 6,<br>    "min_size": 1,<br>    "mixed_instances_policy": {<br>      "instances_distribution": {<br>        "on_demand_allocation_strategy": "prioritized",<br>        "on_demand_base_capacity": 0,<br>        "on_demand_percentage_above_base_capacity": 0,<br>        "spot_allocation_strategy": "lowest-price"<br>      },<br>      "override": [<br>        {<br>          "instance_type": "m5.large",<br>          "weighted_capacity": "1"<br>        },<br>        {<br>          "instance_type": "c5.large",<br>          "weighted_capacity": "1"<br>        }<br>      ]<br>    },<br>    "use_mixed_instances_policy": true<br>  }<br>}</pre> | no |
 | <a name="input_ecs_cluster_config"></a> [ecs\_cluster\_config](#input\_ecs\_cluster\_config) | Cluster configuration object `execute_command_configuration`,  see more [terraform docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster) | `any` | <pre>{<br>  "log_configuration": {<br>    "cloud_watch_log_group_name": "/aws/ecs/aws-ec2"<br>  },<br>  "logging": "OVERRIDE"<br>}</pre> | no |
@@ -146,7 +160,7 @@ See [Production example](examples/production/README.md) for further information.
 | <a name="input_stage"></a> [stage](#input\_stage) | Stage, e.g. 'prod', 'staging', 'dev' | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `map('BusinessUnit','XYZ')` | `map(string)` | `{}` | no |
 | <a name="input_vpc_config"></a> [vpc\_config](#input\_vpc\_config) | VPC configuration, ignored if `external_vpc` is set | <pre>object({<br>    ipv4_primary_cidr_block = string<br>    availability_zones      = list(string)<br>  })</pre> | <pre>{<br>  "availability_zones": [<br>    "eu-central-1a",<br>    "eu-central-1b",<br>    "eu-central-1c"<br>  ],<br>  "ipv4_primary_cidr_block": "10.0.0.0/16"<br>}</pre> | no |
-| <a name="input_zone_id"></a> [zone\_id](#input\_zone\_id) | Route53 DNS zone ID, if not set AWS route53 will be not used | `string` | `""` | no |
+| <a name="input_zone_id"></a> [zone\_id](#input\_zone\_id) | Route53 DNS zone ID, if not set AWS route53 will be not used | `string` | `null` | no |
 
 ## Outputs
 
