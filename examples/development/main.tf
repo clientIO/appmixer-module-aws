@@ -148,7 +148,7 @@ module "appmixer_module" {
     }
     quota = {
       entrypoint = ["/bin/bash", "-c"]
-      command    = ["apt-get update; apt-get -y install wget; wget -O /root//global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; npm start"]
+      command    = ["apt-get update; apt-get -y install wget; wget -O /root/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; npm start"]
     }
   }
 
