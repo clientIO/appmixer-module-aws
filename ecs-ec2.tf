@@ -39,20 +39,20 @@ locals {
 
   # ECS EC2 configuration
   user_data = join("\n", [
-        "#!/bin/bash",
-        "",
-        "cat <<'EOF' >> /etc/ecs/ecs.config",
-        "ECS_CLUSTER=${module.label.id}",
-        "ECS_LOGLEVEL=debug",
-        "ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(module.label.tags)}",
-        "ECS_ENABLE_TASK_IAM_ROLE=true",
-        "ECS_ENABLE_HIGH_DENSITY_ENI=true",
-        "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true",
-        "ECS_ENGINE_AUTH_TYPE=dockercfg",
-        "ECS_ENGINE_AUTH_DATA=${sensitive(try(base64decode(var.ecs_registry_auth_data), ""))}",
-        "EOF"
+    "#!/bin/bash",
+    "",
+    "cat <<'EOF' >> /etc/ecs/ecs.config",
+    "ECS_CLUSTER=${module.label.id}",
+    "ECS_LOGLEVEL=debug",
+    "ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(module.label.tags)}",
+    "ECS_ENABLE_TASK_IAM_ROLE=true",
+    "ECS_ENABLE_HIGH_DENSITY_ENI=true",
+    "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true",
+    "ECS_ENGINE_AUTH_TYPE=dockercfg",
+    "ECS_ENGINE_AUTH_DATA=${sensitive(try(base64decode(var.ecs_registry_auth_data), ""))}",
+    "EOF"
   ])
- # pragma: allowlist secret
+  # pragma: allowlist secret
 }
 
 module "alb" {
