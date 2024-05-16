@@ -49,9 +49,10 @@ locals {
         "ECS_ENABLE_HIGH_DENSITY_ENI=true",
         "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true",
         "ECS_ENGINE_AUTH_TYPE=dockercfg",
-        "ECS_ENGINE_AUTH_DATA=${sensitive(try(base64decode(var.ecs_registry_auth_data), \"\"))}", # pragma: allowlist secret
+        "ECS_ENGINE_AUTH_DATA=${sensitive(try(base64decode(var.ecs_registry_auth_data), \"\"))}",
         "EOF"
   ])
+ # pragma: allowlist secret
 }
 
 module "alb" {
