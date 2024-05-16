@@ -38,20 +38,20 @@ locals {
   logstash_env_container   = [for k, v in module.services_configuration_merge.merged.logstash.env : { name = k, value = v }]
 
   # ECS EC2 configuration
-  user_data = <<-EOT
-        #!/bin/bash
-
-        cat <<'EOF' >> /etc/ecs/ecs.config
-        ECS_CLUSTER=${module.label.id}
-        ECS_LOGLEVEL=debug
-        ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(module.label.tags)}
-        ECS_ENABLE_TASK_IAM_ROLE=true
-        ECS_ENABLE_HIGH_DENSITY_ENI=true
-        ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
-        ECS_ENGINE_AUTH_TYPE=dockercfg
-        ECS_ENGINE_AUTH_DATA=${sensitive(try(base64decode(var.ecs_registry_auth_data), ""))} # pragma: allowlist secret
-        EOF
-      EOT
+  user_data = join("\n", [
+        "#!/bin/bash",
+        "",
+        "cat <<'EOF' >> /etc/ecs/ecs.config",
+        "ECS_CLUSTER=${module.label.id}",
+        "ECS_LOGLEVEL=debug",
+        "ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(module.label.tags)}",
+        "ECS_ENABLE_TASK_IAM_ROLE=true",
+        "ECS_ENABLE_HIGH_DENSITY_ENI=true",
+        "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true",
+        "ECS_ENGINE_AUTH_TYPE=dockercfg",
+        "ECS_ENGINE_AUTH_DATA=${sensitive(try(base64decode(var.ecs_registry_auth_data), \"\"))}", # pragma: allowlist secret
+        "EOF"
+  ])
 }
 
 module "alb" {
