@@ -1,7 +1,7 @@
 locals {
   elasticsearch_master_username = random_pet.elasticsearch_username.id
   elasticsearch_enabled         = var.external_elasticsearch == null
-  elasticsearch_subnet_ids      = slice(local.private_subnet_ids, 0, min(length(local.private_subnet_ids), var.elasticsearch.instance_count))
+  elasticsearch_subnet_ids      = [local.private_subnet_ids[0]]
 }
 
 module "elasticsearch" {
