@@ -3,6 +3,11 @@ output "alb_dns_name" {
   description = "DNS name of the ALB"
 }
 
+output "elasticsearch_subnet_ids" {
+  value       = local.elasticsearch_subnet_ids
+  description = "ES subnets"
+}
+
 output "services_urls" {
   value = {
     backoffice = local.backoffice.url
