@@ -58,7 +58,7 @@ locals {
 
   # Frontend service configuration
   frontend = {
-    image = "registry.appmixer.com/appmixer-frontend:6.0.11"
+    image = "registry.appmixer.com/appmixer-frontend:6.0.12"
     url   = "my.${var.root_dns_name}"
     env = {
       APPMIXER_BO_URL = "https://${local.backoffice.url}"
@@ -69,7 +69,7 @@ locals {
 
   # Backoffice service configuration
   backoffice = {
-    image  = "registry.appmixer.com/appmixer-backoffice:6.0.11"
+    image  = "registry.appmixer.com/appmixer-backoffice:6.0.12"
     url    = "bo.${var.root_dns_name}"
     env    = {}
     cpu    = 256
@@ -78,7 +78,7 @@ locals {
 
   # Engine service configuration
   engine = {
-    image = "registry.appmixer.com/appmixer-engine:6.0.11-nocomp"
+    image = "registry.appmixer.com/appmixer-engine:6.0.12-nocomp"
     url   = "api.${var.root_dns_name}"
     env = {
       SYSTEM_PLUGINS     = "minio,auth_hub"
@@ -109,7 +109,7 @@ locals {
 
   # Quota service configuration
   quota = {
-    image = "registry.appmixer.com/appmixer-quota:6.0.11"
+    image = "registry.appmixer.com/appmixer-quota:6.0.12"
     env = {
       DB_TLS_CA_FILE  = "/root/global-bundle.pem"
       DB_USE_TLS      = "true"
