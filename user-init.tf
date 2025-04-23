@@ -45,11 +45,11 @@ resource "aws_ecs_task_definition" "this" {
   container_definitions = jsonencode([
     {
       name       = "${module.label.id}-mongo-init-user"
-      image      = "mongo:latest"
+      image      = "mongo:5.0"
       cpu        = 10
       memory     = 512
       essential  = true
-      entryPoint = ["/bin/bash", "-c", "apt-get update --allow-insecure-repositories; apt-get install wget; wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem;  mongosh appmixer --host ${module.documentdb_cluster.endpoint}:27017 --username ${module.documentdb_cluster.master_username} --password ${module.documentdb_cluster.master_password} --retryWrites=false --eval 'db.users.updateOne({ email: \"${local.user_init_email}\"},{$set: {scope: [\"user\",\"admin\"]}});' --tls --tlsCAFile global-bundle.pem"]
+      entryPoint = ["/bin/bash", "-c", "apt-get update --allow-insecure-repositories; apt-get install wget; wget -O /root/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem;  mongosh appmixer --host ${module.documentdb_cluster.endpoint}:27017 --authenticationMechanism SCRAM-SHA-1 --username ${module.documentdb_cluster.master_username} --password ${module.documentdb_cluster.master_password} --retryWrites=false --eval 'db.users.updateOne({ email: \"${local.user_init_email}\"},{$set: {scope: [\"user\",\"admin\"]}});' --tls --tlsCAFile /root/global-bundle.pem"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {

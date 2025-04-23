@@ -25,12 +25,12 @@ module "appmixer_module" {
   }
 
   init_user = {
-    email    = "XXX"
-    username = "XXX"
-    password = "XXX"
+    email    = "<init-user@email.tld>"
+    username = "<init-user>"
+    password = "<init-user-password>"
   }
 
-  ecs_registry_auth_data = "XXX"
+  ecs_registry_auth_data = "base64-encoded-docker-registry-auth-dockerconfigjson"
 
   ecs_common_service_config = {
     wait_for_steady_state    = true
@@ -113,6 +113,18 @@ module "appmixer_module" {
           base   = 0
         }
       }
+    }
+  }
+
+  # Engine fix to use MongoDB TLS
+  ecs_per_service_config = {
+    engine = {
+      entrypoint = ["/bin/bash", "-c"]
+      command    = ["apt-get update; apt-get -y install wget; wget -O /root/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; node gridd.js --http --emails"]
+    }
+    quota = {
+      entrypoint = ["/bin/bash", "-c"]
+      command    = ["apt-get update; apt-get -y install wget; wget -O /root/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem; npm start"]
     }
   }
 

@@ -58,7 +58,7 @@ locals {
 
   # Frontend service configuration
   frontend = {
-    image = "registry.appmixer.com/appmixer-frontend:5.2.0"
+    image = "registry.appmixer.com/appmixer-frontend:6.0.12"
     url   = "my.${var.root_dns_name}"
     env = {
       APPMIXER_BO_URL = "https://${local.backoffice.url}"
@@ -69,7 +69,7 @@ locals {
 
   # Backoffice service configuration
   backoffice = {
-    image  = "registry.appmixer.com/appmixer-backoffice:5.2.0"
+    image  = "registry.appmixer.com/appmixer-backoffice:6.0.12"
     url    = "bo.${var.root_dns_name}"
     env    = {}
     cpu    = 256
@@ -78,19 +78,23 @@ locals {
 
   # Engine service configuration
   engine = {
-    image = "registry.appmixer.com/appmixer-engine:5.2.0-nocomp"
+    image = "registry.appmixer.com/appmixer-engine:6.0.12-nocomp"
     url   = "api.${var.root_dns_name}"
     env = {
-      SYSTEM_PLUGINS    = "minio"
-      MINIO_ACCESS_KEY  = module.s3_bucket.access_key_id
-      MINIO_SECRET_KEY  = module.s3_bucket.secret_access_key
-      MINIO_ENDPOINT    = "s3.amazonaws.com"
-      MINIO_USE_SSL     = true
-      MINIO_REGION      = data.aws_region.current.name
-      MINIO_BUCKET_NAME = module.s3_bucket.bucket_id
-      DB_TLS_CA_FILE    = "global-bundle.pem"
-      DB_USE_TLS        = "true"
-      DB_SSL_VALIDATE   = "true"
+      SYSTEM_PLUGINS     = "minio,auth_hub"
+      MINIO_ACCESS_KEY   = module.s3_bucket.access_key_id
+      MINIO_SECRET_KEY   = module.s3_bucket.secret_access_key
+      MINIO_ENDPOINT     = "s3.amazonaws.com"
+      MINIO_USE_SSL      = true
+      MINIO_REGION       = data.aws_region.current.name
+      MINIO_BUCKET_NAME  = module.s3_bucket.bucket_id
+      DB_TLS_CA_FILE     = "/root/global-bundle.pem"
+      DB_USE_TLS         = "true"
+      DB_SSL_VALIDATE    = "true"
+      AUTH_HUB_URL       = "https://auth-hub.${var.root_dns_name}"
+      AUTH_HUB_TOKEN     = "<replace-with-token-value>"
+      ENCRYPTION_ENABLED = "true"
+      ENCRYPTION_SECRET  = "<replace-with-encryption-secret>"
     }
     cpu          = 512
     memory       = 1024
@@ -105,7 +109,7 @@ locals {
 
   # Quota service configuration
   quota = {
-    image = "registry.appmixer.com/appmixer-quota:5.2.0"
+    image = "registry.appmixer.com/appmixer-quota:6.0.12"
     env = {
       DB_TLS_CA_FILE  = "/root/global-bundle.pem"
       DB_USE_TLS      = "true"

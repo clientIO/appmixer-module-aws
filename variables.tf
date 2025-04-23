@@ -113,7 +113,7 @@ variable "rabbitmq" {
   type = object({
     auto_minor_version_upgrade = optional(bool, true)
     deployment_mode            = optional(string, "SINGLE_INSTANCE")
-    engine_version             = optional(string, "3.8.34")
+    engine_version             = optional(string, "3.13")
     host_instance_type         = optional(string, "mq.t3.micro")
     audit_log_enabled          = optional(bool, false)
     general_log_enabled        = optional(bool, true)
