@@ -27,10 +27,10 @@ module "appmixer_module" {
   init_user = {
     email    = "<init-user@email.tld>"
     username = "<init-user>"
-    password = "<Init-user-password"
+    password = "<init-user-password>"
   }
 
-  ecs_registry_auth_data = "{"registry.appmixer.com":{"auth":"<as described in the one of previous commits>"}}""
+  ecs_registry_auth_data = "base64-encoded-docker-registry-auth-dockerconfigjson"
 
   ecs_common_service_config = {
     wait_for_steady_state    = true

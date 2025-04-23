@@ -92,7 +92,7 @@ locals {
       DB_USE_TLS         = "true"
       DB_SSL_VALIDATE    = "true"
       AUTH_HUB_URL       = "https://auth-hub.${var.root_dns_name}"
-      AUTH_HUB_TOKEN     = "<replace-with-token-value"
+      AUTH_HUB_TOKEN     = "<replace-with-token-value>"
       ENCRYPTION_ENABLED = "true"
       ENCRYPTION_SECRET  = "<replace-with-encryption-secret>"
     }
